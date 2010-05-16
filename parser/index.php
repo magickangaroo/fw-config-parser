@@ -13,9 +13,15 @@ require_once("classes/parser.php");
   </style>
 </head>
 <body>
+<!-- Parser status: 
 <?php
-  if($dir_handle=opendir(dirname(__FILE__))) {
+  $file_dir=dirname(__FILE__) . '/../example_configs/sidewinder/';
+  if($dir_handle=opendir($file_dir)) {
     while(false !== ($filename=readdir($dir_handle))) {
+      $filename=$file_dir.$filename;
+      echo "\r\n$filename";
+      if($oldfilename==$filename) {exit(0);}
+      $oldfilename=$filename;
       if(!is_dir($filename) and substr($filename, -4)!='.php') {
         $file[basename($filename, '.config')]=str_replace("\r\n", "\n", 
                                                 str_replace("     ", " ", 
@@ -34,6 +40,7 @@ require_once("classes/parser.php");
       }
     }
   }
+  echo " -->\r\n";
   asort($file);
   foreach($file as $filename=>$file_contents) {
     $config=explode("\n", $file_contents);
