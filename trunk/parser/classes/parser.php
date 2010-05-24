@@ -6,7 +6,7 @@
     protected $data=array();
     function __construct($arr) {$this->data=$arr;}
     function add($key='', $obj) {$this->data[$key][]=$obj;}
-    function get($key='') {return $this->data[$key];}
+    function get($key='') {if(isset($this->data[$key])) {return $this->data[$key];} else {return(null);}}
     function set($key='', $data=null) {
       if(isset($this->data[$key])) {
         if(!empty($data)) {
@@ -159,7 +159,8 @@
       } else {
         $state='disabled';
       }
-      $return.="<tr class='{$state} rulegroup'><td class='rulegroup' colspan='9'>{$this->data['name']}</td></tr>";
+      if(!isset($this->data['name'])) {$this->data['name']='';}
+      $return="<tr class='{$state} rulegroup'><td class='rulegroup' colspan='9'>{$this->data['name']}</td></tr>";
       if(isset($this->data['children']) and count($this->data['children'])>0) {
         $return.="\r\n<tbody class='child_policy {$state}'>\r\n";
         foreach($this->data['children'] as $child) {$return.=$child;}
@@ -271,7 +272,7 @@
       if($this->data['redir_port']!='') {
         $return.="\r\n<td class='service_nat'>";
         $not_first=0;
-        if(count($this->data['redir_port_'])>0) {
+        if(isset($this->data['redir_port_']) and count($this->data['redir_port_'])>0) {
           foreach($this->data['redir_port_'] as $redir_port) {
             if($not_first==1) {$return.=", ";}
             $return.=$redir_port;

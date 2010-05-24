@@ -13,13 +13,12 @@ require_once("classes/parser.php");
   </style>
 </head>
 <body>
-<!-- Parser status: 
 <?php
   $file_dir=dirname(__FILE__) . '/../example_configs/sidewinder/';
+  $oldfilename='';
   if($dir_handle=opendir($file_dir)) {
     while(false !== ($filename=readdir($dir_handle))) {
       $filename=$file_dir.$filename;
-      echo "\r\n$filename";
       if($oldfilename==$filename) {exit(0);}
       $oldfilename=$filename;
       if(!is_dir($filename) and substr($filename, -4)!='.php') {
@@ -40,7 +39,6 @@ require_once("classes/parser.php");
       }
     }
   }
-  echo " -->\r\n";
   asort($file);
   foreach($file as $filename=>$file_contents) {
     $config=explode("\n", $file_contents);
@@ -139,7 +137,11 @@ require_once("classes/parser.php");
     foreach($configuration['burb'] as $line) {
       if(isset($line['add'])) {
         $obj['burb'][$line['name']]=new cBurb($line);
-        $burbgroups=explode(',', $line['burbgroups']);
+        if(isset($line['burbgroups'])) {
+          $burbgroups=explode(',', $line['burbgroups']);
+        } else {
+          $burbgroups=array();
+        }
         if(count($burbgroups)>0 and $burbgroups[0]!='') {
           foreach($burbgroups as $burbgroup) {
             if(isset($obj['burbgroup'][$burbgroup])) {
