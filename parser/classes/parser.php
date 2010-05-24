@@ -22,9 +22,9 @@
   class cInterface extends cGeneric { // Done
     function __toString() {
       if($this->data['hwdevice']==$this->data['name'] or $this->data['hwdevice']=='') {
-        return "'" . $this->data['name'] . "'";
+        return "Int: '" . $this->data['name'] . "'";
       } else {
-        return("'" . $this->data['name'] . "' (" . $this->data['hwdevice'] . ')');
+        return("Int: '" . $this->data['name'] . "' (" . $this->data['hwdevice'] . ')');
       }
     }
   }
@@ -34,7 +34,7 @@
   class cBurb extends cGeneric { // Done
     function __toString() {
       $not_first=0;
-      $return="'" . $this->data['name'] . "'";
+      $return="Burb: '" . $this->data['name'] . "'";
       if(isset($this->data['interface'])) {
         $return.=' (';
         foreach($this->data['interface'] as $interface) {
@@ -50,7 +50,7 @@
   class cBurbgroup extends cGeneric { // Done
     function __toString() {
       $not_first=0;
-      $return="'" . $this->data['name'] . "'";
+      $return="Burbgroup: '" . $this->data['name'] . "'";
       if(isset($this->data['burbs'])) {
         $return.=' (';
         foreach($this->data['burbs'] as $burb) {
@@ -67,7 +67,7 @@
     function __toString() {return ucfirst($this->data['type']) . ": '" . $this->data['name'] . "'";}
   }
   class cIpsec extends cGeneric { // Done
-    function __toString() {return "'" . $this->data['name'] . "' (" . ucfirst($this->data['encapsulation']) . ' to ' . $this->data['remotegw'] . ")";}
+    function __toString() {return "IPSEC: '" . $this->data['name'] . "' (" . ucfirst($this->data['encapsulation']) . ' to ' . $this->data['remotegw'] . ")";}
   }
   class cService extends cGeneric { // Done
     function __toString() {
@@ -85,7 +85,7 @@
   class cServicegroup extends cGeneric { // Done
     function __toString() {
       $not_first=0;
-      $return="'" . $this->data['name'] . "'";
+      $return="Servicegroup: '" . $this->data['name'] . "'";
       if(isset($this->data['services'])) {
         $return.=' (';
         foreach($this->data['services'] as $service) {
@@ -99,21 +99,21 @@
     }
   }
   class cHost extends cGeneric {
-    function __toString() {return "'" . $this->data['name'] . "' (" . $this->data['host_'] . ')';}
+    function __toString() {return "Host: '" . $this->data['name'] . "' (" . $this->data['host_'] . ')';}
   }
   class cIpaddr extends cGeneric {
-    function __toString() {return "'" . $this->data['name'] . "' (" . $this->data['ipaddr_'] . ')';}
+    function __toString() {return "IP: '" . $this->data['name'] . "' (" . $this->data['ipaddr_'] . ')';}
   }
   class cSubnet extends cGeneric {
-    function __toString() {return "'" . $this->data['name'] . "' (" . $this->data['subnet_'] . '/' . $this->data['bits'] . ')';}
+    function __toString() {return "Subnet: '" . $this->data['name'] . "' (" . $this->data['subnet_'] . '/' . $this->data['bits'] . ')';}
   }
   class cIprange extends cGeneric {
-    function __toString() {return "'" . $this->data['name'] . "' (" . $this->data['begin'] . '-' . $this->data['end'] . ')';}
+    function __toString() {return "Range: '" . $this->data['name'] . "' (" . $this->data['begin'] . '-' . $this->data['end'] . ')';}
   }
   class cGeolocation extends cGeneric {
     function __toString() {
       $not_first=0;
-      $return="'" . $this->data['name'] . "'";
+      $return="Geo: '" . $this->data['name'] . "'";
       if(isset($this->data['members'])) {
         $return.=' (' . $this->data['members'] . ')';
       }
@@ -123,7 +123,7 @@
   class cNetmap extends cGeneric {
     function __toString() {
       $not_first=0;
-      $return="'" . $this->data['name'] . "'";
+      $return="NAT: '" . $this->data['name'] . "'";
       if(isset($this->data['members_'])) {
         $return.=' (';
         foreach($this->data['members_'] as $member) {
@@ -139,7 +139,7 @@
   class cNetgroup extends cGeneric {
     function __toString() {
       $not_first=0;
-      $return="'" . $this->data['name'] . "'";
+      $return="Group: '" . $this->data['name'] . "'";
       if(isset($this->data['members_'])) {
         $return.=' (';
         foreach($this->data['members_'] as $member) {
@@ -154,27 +154,38 @@
   }
   class cRulegroup extends cGeneric {
     function __toString() {
+      global $this_section;
       if($this->data['disable']=='no') {
-        $state='';
+        $state='enabled';
       } else {
         $state='disabled';
       }
-      if(!isset($this->data['name'])) {$this->data['name']='';}
-      $return="<tr class='{$state} rulegroup'><td class='rulegroup' colspan='9'>{$this->data['name']}</td></tr>";
+      $return='';
+      if(isset($this->data['name'])) {
+        $id='';
+        $this_section[$this->data['name']]=$this->data['name'];
+        foreach($this_section as $section) {$id.="$section ";}
+        $return="<tr class='{$state} rulegroup' id='{$id}'><td class='rulegroup' colspan='9'>Group: {$this->data['name']} (start)</td></tr>";
+      }
       if(isset($this->data['children']) and count($this->data['children'])>0) {
-        $return.="\r\n<tbody class='child_policy {$state}'>\r\n";
         foreach($this->data['children'] as $child) {$return.=$child;}
-        $return.="\r\n</tbody>\r\n";
+      }
+      if(isset($this->data['name'])) {
+        $return.="<tr class='{$state} rulegroup' id='{$id}'><td class='rulegroup' colspan='9'>Group: {$this->data['name']} (end)</td></tr>";
+        unset($this_section[$this->data['name']]);
       }
       return($return);
     }
   }
   class cRule extends cGeneric {
     function __toString() {
+      global $this_section;
+      $id='';
+      if(isset($this_section)) {foreach($this_section as $section) {$id.="$section ";}}
       if($this->data['disable']=='no') {
-        $return="<tr class='enabled'>";
+        $return="<tr class='enabled rule' id='{$id}'>";
       } else {
-        $return="<tr class='disabled'>";
+        $return="<tr class='disabled rule' id='{$id}'>";
       }
       $return.="\r\n<td class='name'>{$this->data['name']}</td>";
       if($this->data['source_burbs']!='*') {
@@ -285,7 +296,8 @@
       } else {
         $return.="\r\n<td class='service_nat'>&nbsp;</td>";
       }
-      $return.="</tr>";
+      $return.="</tr>\r\n";
+      $return.="<!-- " . var_export($this->data, TRUE) . " -->\r\n";
       return($return);
     }
   }
