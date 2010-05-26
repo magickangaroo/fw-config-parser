@@ -4,6 +4,7 @@
 
   class cGeneric {
     protected $data=array();
+    function __toString() {return var_export($this->data, TRUE);}
     function __construct($arr) {$this->data=$arr;}
     function add($key='', $obj) {$this->data[$key][]=$obj;}
     function get($key='') {if(isset($this->data[$key])) {return $this->data[$key];} else {return(null);}}
@@ -19,7 +20,9 @@
       }
     }
   }
-  class cInterface extends cGeneric { // Done
+  class cAppfilter extends cGeneric {}
+  class cAudit extends cGeneric {}
+  class cInterface extends cGeneric {
     function __toString() {
       if($this->data['hwdevice']==$this->data['name'] or $this->data['hwdevice']=='') {
         return "Int: '" . $this->data['name'] . "'";
@@ -28,10 +31,10 @@
       }
     }
   }
-  class cAdminuser extends cGeneric { // Done
+  class cAdminuser extends cGeneric {
     function __toString() {return "User: '" . $this->data['username'] . "'";}
   }
-  class cBurb extends cGeneric { // Done
+  class cBurb extends cGeneric {
     function __toString() {
       $not_first=0;
       $return="Burb: '" . $this->data['name'] . "'";
@@ -47,7 +50,7 @@
       return($return);
     }
   }
-  class cBurbgroup extends cGeneric { // Done
+  class cBurbgroup extends cGeneric {
     function __toString() {
       $not_first=0;
       $return="Burbgroup: '" . $this->data['name'] . "'";
@@ -63,13 +66,13 @@
       return($return);
     }
   }
-  class cAgent extends cGeneric { // Done
+  class cAgent extends cGeneric {
     function __toString() {return ucfirst($this->data['type']) . ": '" . $this->data['name'] . "'";}
   }
-  class cIpsec extends cGeneric { // Done
+  class cIpsec extends cGeneric {
     function __toString() {return "IPSEC: '" . $this->data['name'] . "' (" . ucfirst($this->data['encapsulation']) . ' to ' . $this->data['remotegw'] . ")";}
   }
-  class cService extends cGeneric { // Done
+  class cService extends cGeneric {
     function __toString() {
       $not_first=0;
       $return=$this->data['agent_object'] . " - '" . $this->data['name'] . "'";
@@ -82,7 +85,7 @@
       return($return);
     }
   }
-  class cServicegroup extends cGeneric { // Done
+  class cServicegroup extends cGeneric {
     function __toString() {
       $not_first=0;
       $return="Servicegroup: '" . $this->data['name'] . "'";
@@ -296,8 +299,8 @@
       } else {
         $return.="\r\n<td class='service_nat'>&nbsp;</td>";
       }
-      $return.="</tr>\r\n";
-      $return.="<!-- " . var_export($this->data, TRUE) . " -->\r\n";
+      $return.="</tr>";
+      $return.="<tr class='hidden rule fulldata'><td class='hidden rule fulldata' colspan='9'>" . var_export($this->data, TRUE) . "</td></tr>\r\n";
       return($return);
     }
   }

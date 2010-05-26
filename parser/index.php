@@ -15,12 +15,13 @@ $files='../example_configs/sidewinder/';
     TR.disabled TD {background:red;}
     TABLE {width:100%;}
     TABLE, TR, TD, TH {border: 1px solid black; border-collapse: collapse; margin: 0; padding: 0;}
+    .hidden {display:none;}
   </style>
 </head>
 <body>
 <?php
-  $file_dir='../';
-  //$file_dir=dirname(__FILE__) . '/' . $files;
+  //$file_dir='../';
+  $file_dir=dirname(__FILE__) . '/' . $files;
   $oldfilename='';
   if($dir_handle=opendir($file_dir)) {
     while(false !== ($filename=readdir($dir_handle))) {
@@ -73,7 +74,7 @@ $files='../example_configs/sidewinder/';
         }
       }
     }
-    if(count($configuration['interface'])>0) { // Done
+    if(count($configuration['interface'])>0) {
       foreach($configuration['interface'] as $line) {
         if(isset($line['modify'])) {
           $obj['interface'][$line['name']]=new cInterface($line);
@@ -87,21 +88,49 @@ $files='../example_configs/sidewinder/';
         }
       }
     }
-    if(count($configuration['adminuser'])>0) { // Done
+    if(count($configuration['appfilter'])>0) {
+      foreach($configuration['appfilter'] as $line) {
+        if(isset($line['add'])) {
+          $obj['appfilter'][$line['name']]=new cAppfilter($line);
+        }
+        if(isset($line['modify'])) {
+          foreach($obj['appfilter'] as $name=>$data) {
+            if($name==$line['name']) {
+              foreach($line as $key=>$value) {$data->set($key, $value);}
+            }
+          }
+        }
+      }
+    }
+    if(count($configuration['audit'])>0) {
+      foreach($configuration['audit'] as $line) {
+        if(isset($line['add'])) {
+          $obj['audit'][$line['name']]=new cAudit($line);
+        }
+        if(isset($line['modify'])) {
+          foreach($obj['audit'] as $name=>$data) {
+            if($name==$line['name']) {
+              foreach($line as $key=>$value) {$data->set($key, $value);}
+            }
+          }
+        }
+      }
+    }
+    if(count($configuration['adminuser'])>0) {
       foreach($configuration['adminuser'] as $line) {
         if(isset($line['add'])) {
           $obj['adminuser'][$line['username']]=new cAdminuser($line);
         }
       }
     }
-    if(count($configuration['agent'])>0) { // Done
+    if(count($configuration['agent'])>0) {
       foreach($configuration['agent'] as $line) {
         if(isset($line['modify'])) {
           $obj['agent'][$line['name']]=new cAgent($line);
         }
       }
     }
-    if(count($configuration['service'])>0) { // Done
+    if(count($configuration['service'])>0) {
       foreach($configuration['service'] as $line) {
         if(isset($line['add']) or isset($line['modify'])) {
           $obj['service'][$line['name']]=new cService($line);
@@ -109,7 +138,7 @@ $files='../example_configs/sidewinder/';
         }
       }
     }
-    if(count($configuration['servicegroup'])>0) { // Done
+    if(count($configuration['servicegroup'])>0) {
       foreach($configuration['servicegroup'] as $line) {
         if(isset($line['add'])) {
           $obj['servicegroup'][$line['name']]=new cServicegroup($line);
@@ -124,21 +153,21 @@ $files='../example_configs/sidewinder/';
         }
       }
     }
-    if(count($configuration['ipsec'])>0) { // Done
+    if(count($configuration['ipsec'])>0) {
       foreach($configuration['ipsec'] as $line) {
         if(isset($line['add'])) {
           $obj['ipsec'][$line['name']]=new cIpsec($line);
         }
       }
     }
-    if(count($configuration['burbgroup'])>0) { // Done
+    if(count($configuration['burbgroup'])>0) {
       foreach($configuration['burbgroup'] as $line) {
         if(isset($line['add'])) {
           $obj['burbgroup'][$line['name']]=new cBurbgroup($line);
         }
       }
     }
-    if(count($configuration['burb'])>0) { // Done
+    if(count($configuration['burb'])>0) {
       foreach($configuration['burb'] as $line) {
         if(isset($line['add'])) {
           $obj['burb'][$line['name']]=new cBurb($line);
@@ -269,6 +298,38 @@ $files='../example_configs/sidewinder/';
     }
   }
 
+foreach($configuration as $object=>$content) {
+  switch($object) {
+    case 'rulegroup':
+    case 'rule':
+    case 'subnet':
+    case 'netmap':
+    case 'iprange':
+    case 'netgroup':
+    case 'geolocation':
+    case 'ipaddr':
+    case 'host':
+    case 'interface':
+    case 'burb':
+    case 'burbgroup':
+    case 'agent':
+    case 'ipsec':
+    case 'service':
+    case 'servicegroup':
+    case 'appfilter':
+    case 'audit':
+    case 'adminuser':
+      // We already handle this data, don't bother showing it.
+      break;
+    case 'mvm':
+    case 'cluster':
+      // This data isn't at all relevant
+      break;
+    default:
+      $obj[$object]=new cGeneric($content);
+  }
+}
+
 echo "<table>";
 echo "<thead>";
 echo "<tr><th>Rule Name</th><th>Source Burb</th><th>Source Address</th><th>Source NAT</th><th>Destination Burb</th><th>Destination Address</th><th>Destination NAT</th><th>Service</th><th>Service PAT</th><tr>";
@@ -276,3 +337,43 @@ echo "</thead><tbody>";
 echo $obj['rulegroup']['__ROOT'];
 echo "</tbody>";
 echo "</table>";
+echo "<div class=\"hidden\"><br>";
+foreach($obj as $object=>$content) {
+  switch($object) {
+    case 'rulegroup':
+    case 'rule':
+    case 'subnet':
+    case 'netmap':
+    case 'iprange':
+    case 'netgroup':
+    case 'geolocation':
+    case 'ipaddr':
+    case 'host':
+    case 'interface':
+    case 'burb':
+    case 'burbgroup':
+    case 'agent':
+    case 'ipsec':
+    case 'service':
+    case 'servicegroup':
+      // We already handle this data, don't bother showing it.
+      break;
+    case 'mvm':
+    case 'cluster':
+      // This data isn't at all relevant
+      break;
+    case 'appfilter':
+    case 'audit':
+      // This data is created as an object properly, but isn't really used.
+      echo "<div class=\"parthandled\"><h2 class=\"parthandled\">$object</h2><pre>";
+      var_dump($content);
+      echo "</pre></div>";
+      break;
+    case 'adminuser':
+      echo "<div class=\"parthandled\"><h2 class=\"parthandled\">$object</h2><pre>" . var_export($content, TRUE) . "</pre</div>";
+      break;
+    default:
+      echo "<div class=\"unhandled\"><h2 class=\"unhandled title\">$object</h2><pre>$content</pre></div>";
+  }
+}
+echo "</div>";
